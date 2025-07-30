@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Chamados - Visualizar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        @keyframes spin { from { transform: rotate(0deg ); } to { transform: rotate(360deg); } }
+        .fa-spinner { animation: spin 1s linear infinite; }
+        tr:hover { background-color: #f9fafb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gray-100">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-center text-teal-600 mb-6"><i class="fas fa-lock mr-2"></i>Login</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="loginUser" class="block text-sm font-medium text-gray-700">Usuário</label>
+                    <input type="text" id="loginUser" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+                </div>
+                <div>
+                    <label for="loginPass" class="block text-sm font-medium text-gray-700">Senha</label>
+                    <input type="password" id="loginPass" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+                </div>
+                <button onclick="verificarLogin()" class="w-full bg-teal-600 text-white py-2 rounded-md font-semibold hover:bg-teal-700 transition">Entrar</button>
+                <p id="loginErro" class="text-red-600 text-sm text-center hidden">Usuário ou senha incorretos.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo do Sistema (oculto até login) -->
+    <div id="mainApp" class="hidden">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="assets/logoheader.png" alt="Logo" class="h-8 w-8">
+                <h1 class="text-xl font-bold text-gray-900">Sistema de Chamados</h1>
+            </div>
+                <nav class="flex items-center space-x-2">
+                    <a href="index.html" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Abrir Chamado
+                    </a>
+                    <a href="visualizar.html" class="bg-teal-600 text-white px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-teal-700 transition-colors">
+                        <i class="fas fa-list-ul mr-2"></i>Visualizar Chamados
+                    </a>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-600 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                    </button>
+                </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-10">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Painel de Chamados</h2>
+            
+            <!-- Filtros -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-md border">
+                <div>
+                    <label for="filtroSetor" class="text-sm font-medium text-gray-700">Filtrar por Setor</label>
+                    <select id="filtroSetor" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        <option value="">Todos</option>
+                        <option>TI</option>
+                        <option>Recursos Humanos</option>
+                        <option>Financeiro</option>
+                        <option>Comercial</option>
+                        <option>Operações</option>
+                        <option>Planejamento</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filtroPrioridade" class="text-sm font-medium text-gray-700">Filtrar por Prioridade</label>
+                    <select id="filtroPrioridade" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        <option value="">Todas</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Média">Média</option>
+                        <option value="Baixa">Baixa</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filtroStatus" class="text-sm font-medium text-gray-700">Filtrar por Status</label>
+                    <select id="filtroStatus" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        <option value="">Todos</option>
+                        <option value="Aberto">Aberto</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Concluído">Concluído</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabela de Chamados -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Solicitante</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Setor</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Descrição</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Data</th>
+                            <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Prioridade</th>
+                            <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Imagem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chamadosTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Linhas serão inseridas via JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Estado de Carregamento/Vazio -->
+            <div id="tableState" class="text-center py-10"></div>
+        </div>
+    </main>
+    </div>
+
+    <script>
+        function verificarLogin() {
+            const usuario = document.getElementById("loginUser").value;
+            const senha = document.getElementById("loginPass").value;
+            const erro = document.getElementById("loginErro");
+
+            if (usuario === "admin2" && senha === "admin2") {
+                // Salva o estado de login no sessionStorage
+                sessionStorage.setItem('loggedIn', 'true');
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("mainApp").classList.remove("hidden");
+            } else {
+                erro.classList.remove("hidden");
+            }
+        }
+
+        function verificarEstadoLogin() {
+            // Verifica se o usuário já está logado
+            const loggedIn = sessionStorage.getItem('loggedIn');
+            if (loggedIn === 'true') {
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("mainApp").classList.remove("hidden");
+            }
+        }
+
+        function logout() {
+            // Remove o estado de login e recarrega a página
+            sessionStorage.removeItem('loggedIn');
+            location.reload();
+        }
+
+        // Verifica estado de login ao carregar a página
+        window.addEventListener('DOMContentLoaded', function() {
+            verificarEstadoLogin();
+        });
+    </script>
+
+    <script src="assets/js/view.js"></script>
+</body>
+</html>

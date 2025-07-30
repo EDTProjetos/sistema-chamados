@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Chamados - Abrir Chamado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        @keyframes spin { from { transform: rotate(0deg ); } to { transform: rotate(360deg); } }
+        .fa-spinner { animation: spin 1s linear infinite; }
+        
+        /* Melhorias estéticas */
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+        }
+        .btn-primary {
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gray-100">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-center text-teal-600 mb-6"><i class="fas fa-lock mr-2"></i>Login</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="loginUser" class="block text-sm font-medium text-gray-700">Usuário</label>
+                    <input type="text" id="loginUser" class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+                </div>
+                <div>
+                    <label for="loginPass" class="block text-sm font-medium text-gray-700">Senha</label>
+                    <input type="password" id="loginPass" class="form-input w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+                </div>
+                <button onclick="verificarLogin()" class="btn-primary w-full bg-teal-600 text-white py-2 rounded-md font-semibold hover:bg-teal-700 transition">Entrar</button>
+                <p id="loginErro" class="text-red-600 text-sm text-center hidden">Usuário ou senha incorretos.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo do Sistema (oculto até login) -->
+    <div id="mainApp" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="assets/logoheader.png" alt="Logo" class="h-8 w-8">
+                    <h1 class="text-xl font-bold text-gray-900">Sistema de Chamados</h1>
+                </div>
+                <nav class="flex items-center space-x-2">
+                    <a href="index.html" class="bg-teal-600 text-white px-4 py-2 rounded-md text-sm font-medium shadow-sm hover:bg-teal-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Abrir Chamado
+                    </a>
+                    <a href="visualizar.html" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition-colors">
+                        <i class="fas fa-list-ul mr-2"></i>Visualizar Chamados
+                    </a>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-600 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-3xl mx-auto px-4 py-10">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
+                <div class="gradient-bg p-5">
+                    <h2 class="text-2xl font-bold text-white flex items-center"><i class="fas fa-edit mr-3"></i>Abertura de Novo Chamado</h2>
+                    <p class="text-teal-100 mt-1">Preencha os campos abaixo para registrar sua solicitação.</p>
+                </div>
+
+                <form id="chamadoForm" class="p-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome do Solicitante *</label>
+                            <input type="text" id="nome" required class="form-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail para Contato *</label>
+                            <input type="email" id="email" required class="form-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="setor" class="block text-sm font-medium text-gray-700 mb-1">Setor *</label>
+                            <select id="setor" required class="form-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 transition">
+                                <option value="">Selecione...</option>
+                                <option>TI</option>
+                                <option>Recursos Humanos</option>
+                                <option>Financeiro</option>
+                                <option>Comercial</option>
+                                <option>Operações</option>
+                                <option>Planejamento</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="prioridade" class="block text-sm font-medium text-gray-700 mb-1">Prioridade *</label>
+                            <select id="prioridade" required class="form-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 transition">
+                                <option value="">Selecione...</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Média">Média</option>
+                                <option value="Baixa">Baixa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="descricao" class="block text-sm font-medium text-gray-700 mb-1">Descrição do Problema *</label>
+                        <textarea id="descricao" rows="5" required class="form-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 transition" placeholder="Descreva o problema ou solicitação com o máximo de detalhes possível..."></textarea>
+                    </div>
+
+                    <div>
+                        <label for="imagemAnexo" class="block text-sm font-medium text-gray-700 mb-1">Anexar Imagem (Opcional)</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-teal-400 transition-colors">
+                            <div class="space-y-1 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="imagemAnexo" class="relative cursor-pointer bg-white rounded-md font-medium text-teal-600 hover:text-teal-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500">
+                                        <span>Clique para selecionar</span>
+                                        <input id="imagemAnexo" name="imagemAnexo" type="file" accept="image/*" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">ou arraste e solte</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, GIF até 16MB</p>
+                            </div>
+                        </div>
+                        <div id="imagemPreview" class="mt-3 hidden">
+                            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                <i class="fas fa-image text-teal-500"></i>
+                                <span id="nomeArquivo"></span>
+                                <button type="button" onclick="removerImagem()" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-3 rounded-md border">
+                        <label class="block text-sm font-medium text-gray-600">Data/Hora da Solicitação</label>
+                        <input type="text" id="dataHora" readonly class="w-full bg-gray-100 border-none text-gray-500 mt-1">
+                    </div>
+
+                    <!-- Status Message Area -->
+                    <div id="statusMessage" class="hidden p-4 rounded-md text-sm"></div>
+
+                    <div class="flex items-center justify-end space-x-4 pt-4 border-t">
+                        <button type="reset" class="bg-gray-200 text-gray-800 px-6 py-2 rounded-md font-semibold hover:bg-gray-300 transition">Limpar</button>
+                        <button type="submit" id="submitBtn" class="btn-primary bg-teal-600 text-white px-6 py-2 rounded-md font-semibold hover:bg-teal-700 transition shadow-sm flex items-center justify-center">
+                            <span id="btnText">Enviar Chamado</span>
+                            <i id="btnSpinner" class="fas fa-spinner hidden ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function verificarLogin() {
+            const usuario = document.getElementById("loginUser").value;
+            const senha = document.getElementById("loginPass").value;
+            const erro = document.getElementById("loginErro");
+
+            if (usuario === "admin2" && senha === "admin2") {
+                // Salva o estado de login no sessionStorage
+                sessionStorage.setItem('loggedIn', 'true');
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("mainApp").classList.remove("hidden");
+            } else {
+                erro.classList.remove("hidden");
+            }
+        }
+
+        function verificarEstadoLogin() {
+            // Verifica se o usuário já está logado
+            const loggedIn = sessionStorage.getItem('loggedIn');
+            if (loggedIn === 'true') {
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("mainApp").classList.remove("hidden");
+            }
+        }
+
+        function logout() {
+            // Remove o estado de login e recarrega a página
+            sessionStorage.removeItem('loggedIn');
+            location.reload();
+        }
+
+        function removerImagem() {
+            const input = document.getElementById('imagemAnexo');
+            const preview = document.getElementById('imagemPreview');
+            input.value = '';
+            preview.classList.add('hidden');
+        }
+
+        function configurarUploadImagem() {
+            const input = document.getElementById('imagemAnexo');
+            const preview = document.getElementById('imagemPreview');
+            const nomeArquivo = document.getElementById('nomeArquivo');
+
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    nomeArquivo.textContent = file.name;
+                    preview.classList.remove('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                }
+            });
+        }
+
+        // Preenche data/hora atual no campo e verifica estado de login
+        window.onload = function () {
+            verificarEstadoLogin();
+            configurarUploadImagem();
+            
+            const agora = new Date();
+            const dataHoraFormatada = agora.toLocaleString('pt-BR', {
+                dateStyle: 'short',
+                timeStyle: 'short'
+            });
+            const campoData = document.getElementById("dataHora");
+            if (campoData) campoData.value = dataHoraFormatada;
+        };
+    </script>
+
+    <script src="assets/js/form.js"></script>
+</body>
+</html>
